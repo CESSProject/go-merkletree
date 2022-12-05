@@ -58,7 +58,7 @@ func main() {
 	}
 
 	//Get the structure of the reconstructed node, the incoming leaf node and its auxiliary node.
-	ProofList,err:=t.GetRebuildNodeList(nodeMap,testLeafs)
+	ProofList,err:=t.RebuildNodeListWithTree(nodeMap,testLeafs)
 	if err!=nil{
 		log.Fatal(err)
 	}

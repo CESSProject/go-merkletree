@@ -42,6 +42,12 @@ type Node struct {
 	Index  int64 //The serial number of the node in this layer, the serial number of the leftmost node is 0
 }
 
+type NodeSerializable struct {
+	Hash   []byte
+	Height int64
+	Index  int64
+}
+
 //verifyNode walks down the tree until hitting a leaf, calculating the hash at each level
 //and returning the resulting hash of Node n.
 func (n *Node) verifyNode() ([]byte, error) {
@@ -150,10 +156,10 @@ func GetContentMap(indexs []int64) *map[int64]struct{} {
 	return &content
 }
 
-//GetRebuildNodeList use map to describe the hierarchical relationship of each node participating in the construction of the tree
+//RebuildNodeListWithTree use map to describe the hierarchical relationship of each node participating in the construction of the tree
 //auxiliary: the list of auxiliary nodes, and the list of original nodes can be traced back to the Root node
 //original: a list of original nodes, and a list of auxiliary nodes can be traced back to the Root node
-func (t *MerkleTree) GetRebuildNodeList(auxiliary map[int64][]int64, leaf []int64) ([][]*Node, error) {
+func (t *MerkleTree) RebuildNodeListWithTree(auxiliary map[int64][]int64, leaf []int64) ([][]*Node, error) {
 	var maxHeight int64
 	for k, _ := range auxiliary {
 		if k > maxHeight {
@@ -187,6 +193,24 @@ func (t *MerkleTree) GetRebuildNodeList(auxiliary map[int64][]int64, leaf []int6
 		ProofList[0] = append(ProofList[0], node)
 	}
 	return ProofList, nil
+}
+
+func RebuildNodeList(nodes *[]NodeSerializable) [][]*Node {
+	var maxHeight int64
+	for _, n := range *nodes {
+		if n.Height > maxHeight {
+			maxHeight = n.Height
+		}
+	}
+	ProofList := make([][]*Node, maxHeight+1)
+	for _, n := range *nodes {
+		var node Node
+		node.Hash = n.Hash
+		node.Index = n.Index
+		node.Height = n.Height
+		ProofList[n.Height] = append(ProofList[n.Height], &node)
+	}
+	return ProofList
 }
 
 // GetMerkleAuxiliaryNode: Get Merkle path ,merkle path map and list of auxiliary node
