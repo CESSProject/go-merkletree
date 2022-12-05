@@ -473,7 +473,7 @@ func buildIntermediateWithNodes(nodes []*Node, hashStrategy func() hash.Hash) (*
 	if len(leafs) == 1 {
 		return leafs[0], nil
 	} else {
-		root, err := buildIntermediateWithNodes(nodes, hashStrategy)
+		root, err := buildIntermediateWithNodes(leafs, hashStrategy)
 		if err != nil {
 			return nil, err
 		}
